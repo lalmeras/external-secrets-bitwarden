@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "external-secrets-bw"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Laurent Almeras", email = "lalmeras@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+  "fastapi",
+  "aiohttp",
+  "aiodns"
+]
+
+[project.urls]
+Documentation = "https://github.com/unknown/external-secrets-bw#readme"
+Issues = "https://github.com/unknown/external-secrets-bw/issues"
+Source = "https://github.com/unknown/external-secrets-bw"
+
+[tool.hatch.version]
+path = "src/external_secrets_bw/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "uvicorn[standard]"
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/external_secrets_bw tests}"
+
+[tool.coverage.run]
+source_pkgs = ["external_secrets_bw", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/external_secrets_bw/__about__.py",
+]
+
+[tool.coverage.paths]
+external_secrets_bw = ["src/external_secrets_bw", "*/external-secrets-bw/src/external_secrets_bw"]
+tests = ["tests", "*/external-secrets-bw/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
