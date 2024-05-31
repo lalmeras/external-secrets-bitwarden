@@ -11,6 +11,7 @@ from fastapi import FastAPI
 logging.basicConfig(level=logging.DEBUG)
 
 BW_ENDPOINT = "http://localhost:8087/list/object/items"
+BW_ITEM_ENDPOINT = "http://localhost:8087/object/item/{}"
 BW_SYNC_ENDPOINT = "http://localhost:8087/sync?force=true"
 
 
@@ -58,6 +59,11 @@ async def sync():
     return await bw_sync()
 
 
+@app.get("/item/{item_id}")
+async def root(item_id: str, include_raw: bool = False, include_fields: bool = True):  # noqa: FBT001,FBT002
+    return await bw_item_call(item_id)
+
+
 @app.get("/collection/{collection_id}")
 async def root(collection_id: str, include_raw: bool = False, include_fields: bool = True):  # noqa: FBT001,FBT002
     return wrap(await bw_call(collection_id), include_raw, include_fields)
@@ -88,6 +94,13 @@ def wrap(original, include_raw: bool, include_fields: bool):  # noqa: FBT001
         if include_raw:
             result[f"{item['id']}/raw"] = item
     return result
+
+
+async def bw_item_call(item_id: str):
+    """Forward call to `bw serve` server via REST API call."""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(BW_ITEM_ENDPOINT.format(item_id)) as response:
+            return await response.json()
 
 
 async def bw_call(collection_id: str):

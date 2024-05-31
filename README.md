@@ -17,6 +17,9 @@ This project needs `bw` command (https://bitwarden.com/help/cli/#download-and-in
 export BW_USER=xxx
 export BW_PASSWORD=xxx
 hatch run uvicorn external_secrets_bw.app:app --port 8000
+# loopback sandbox
+systemd-run --pty --user -p PrivateNetwork=yes $( hatch env find )/bin/uvicorn external_secrets_bw.app:app --uds /home/$USER/bw.sock
+http get "http+unix://%2Fhome%2F$USER%2Fbw.sock/item/XXXXXXX"
 ```
 
 ## License
